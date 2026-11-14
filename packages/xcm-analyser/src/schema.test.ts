@@ -58,6 +58,8 @@ const mockGlobalConsensus: TJunctionGlobalConsensus = {
 };
 
 const mockHash = `0x${'ab'.repeat(32)}`;
+const mockAccountId32Hex = `0x${'11'.repeat(32)}`;
+const mockAccountKey20Hex = `0x${'11'.repeat(20)}`;
 
 const allMockJunctions: Junction[] = [
   mockParachain,
@@ -461,8 +463,38 @@ describe('InteriorSchema', () => {
       expect(result.success).toBe(true);
     });
 
-    it('JunctionAccountKey20 should fail for invalid hex key (too short, if length matters implicitly by type name, though schema only checks format)', () => {
+    it('JunctionAccountKey20 should fail for a key shorter than 20 bytes', () => {
       const data = { AccountKey20: { network: 'Kusama', key: '0xabc' } };
+      const result = JunctionAccountKey20.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('JunctionAccountKey20 should fail for a key longer than 20 bytes', () => {
+      const data = { AccountKey20: { network: 'Kusama', key: mockHash } };
+      const result = JunctionAccountKey20.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('JunctionAccountId32 should fail for an id shorter than 32 bytes', () => {
+      const data = { AccountId32: { network: null, id: '0x11' } };
+      const result = JunctionAccountId32.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('JunctionAccountId32 should fail for an id longer than 32 bytes', () => {
+      const data = { AccountId32: { network: null, id: `0x${'11'.repeat(33)}` } };
+      const result = JunctionAccountId32.safeParse(data);
+      expect(result.success).toBe(false);
+    });
+
+    it('JunctionAccountId32 should pass for a 32-byte id', () => {
+      const data = { AccountId32: { network: null, id: mockAccountId32Hex } };
+      const result = JunctionAccountId32.safeParse(data);
+      expect(result.success).toBe(true);
+    });
+
+    it('JunctionAccountKey20 should pass for a 20-byte key', () => {
+      const data = { AccountKey20: { network: null, key: mockAccountKey20Hex } };
       const result = JunctionAccountKey20.safeParse(data);
       expect(result.success).toBe(true);
     });
@@ -491,13 +523,14 @@ describe('InteriorSchema', () => {
 
     it.each(validNetworks)('accepts object network %j in account junctions', (network) => {
       expect(
-        JunctionAccountId32.safeParse({ AccountId32: { network, id: '0x1234' } }).success,
+        JunctionAccountId32.safeParse({ AccountId32: { network, id: mockAccountId32Hex } }).success,
       ).toBe(true);
       expect(
         JunctionAccountIndex64.safeParse({ AccountIndex64: { network, index: 1n } }).success,
       ).toBe(true);
       expect(
-        JunctionAccountKey20.safeParse({ AccountKey20: { network, key: '0x1234' } }).success,
+        JunctionAccountKey20.safeParse({ AccountKey20: { network, key: mockAccountKey20Hex } })
+          .success,
       ).toBe(true);
     });
 
@@ -511,7 +544,7 @@ describe('InteriorSchema', () => {
 
     it.each(invalidNetworks)('rejects invalid object network %j', (network) => {
       expect(
-        JunctionAccountId32.safeParse({ AccountId32: { network, id: '0x1234' } }).success,
+        JunctionAccountId32.safeParse({ AccountId32: { network, id: mockAccountId32Hex } }).success,
       ).toBe(false);
     });
   });

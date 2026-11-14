@@ -6,6 +6,8 @@ import { type Location } from '../types';
 import { convertLocationToUrl, convertLocationToUrlJson, convertXCMToUrls } from './convert';
 
 const mockHash: `0x${string}` = `0x${'ab'.repeat(32)}`;
+const mockAccountId32: `0x${string}` = `0x${'11'.repeat(32)}`;
+const mockAccountKey20: `0x${string}` = `0x${'11'.repeat(20)}`;
 
 describe('convert', () => {
   it.each([
@@ -83,14 +85,14 @@ describe('convert', () => {
         X1: {
           AccountId32: {
             network: null,
-            id: '0x123',
+            id: mockAccountId32,
           },
         },
       },
     };
 
     const result = convertLocationToUrl(location);
-    expect(result).toBe('./AccountId32(null, 0x123)');
+    expect(result).toBe(`./AccountId32(null, ${mockAccountId32})`);
   });
 
   it('should convert location to URL with AccountIndex64 interior', () => {
@@ -117,14 +119,14 @@ describe('convert', () => {
         X1: {
           AccountKey20: {
             network: null,
-            key: '0x123',
+            key: mockAccountKey20,
           },
         },
       },
     };
 
     const result = convertLocationToUrl(location);
-    expect(result).toBe('./AccountKey20(null, 0x123)');
+    expect(result).toBe(`./AccountKey20(null, ${mockAccountKey20})`);
   });
 
   it('should convert location to URL with GeneralKey interior', () => {
@@ -309,7 +311,7 @@ describe('convert', () => {
             X1: {
               AccountId32: {
                 network: null,
-                id: '0xa',
+                id: mockAccountId32,
               },
             },
           },
@@ -337,7 +339,7 @@ describe('convert', () => {
     const result = convertXCMToUrls(xcmCallArguments);
     expect(result).toStrictEqual([
       '../Parachain(2006)',
-      './AccountId32(null, 0xa)',
+      `./AccountId32(null, ${mockAccountId32})`,
       './PalletInstance(50)/GeneralIndex(1984)',
     ]);
   });
@@ -437,13 +439,13 @@ describe('convert', () => {
         X1: {
           AccountId32: {
             network,
-            id: '0x1234',
+            id: mockAccountId32,
           },
         },
       },
     };
 
-    expect(convertLocationToUrl(location)).toBe(`./AccountId32(${expected}, 0x1234)`);
+    expect(convertLocationToUrl(location)).toBe(`./AccountId32(${expected}, ${mockAccountId32})`);
   });
 
   it('convert location to URL from tx arguments with no locations', () => {

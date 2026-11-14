@@ -35,6 +35,7 @@ const createFixedHexString = (bytes: number) => {
   return z.templateLiteral(['0x', z.hex()], { error }).check(z.length(2 + bytes * 2, { error }));
 };
 const HexString4 = createFixedHexString(4);
+const HexString20 = createFixedHexString(20);
 const HexString32 = createFixedHexString(32);
 export const GLOBAL_CONSENSUS_NETWORKS = [
   'polkadot',
@@ -96,7 +97,7 @@ export const NetworkId = GlobalConsensusNetworkSchema.nullable();
 export const JunctionParachain = z.strictObject({ Parachain: Uint32 });
 
 export const JunctionAccountId32 = z.strictObject({
-  AccountId32: z.strictObject({ network: NetworkId, id: HexString }),
+  AccountId32: z.strictObject({ network: NetworkId, id: HexString32 }),
 });
 
 export const JunctionAccountIndex64 = z.strictObject({
@@ -104,7 +105,7 @@ export const JunctionAccountIndex64 = z.strictObject({
 });
 
 export const JunctionAccountKey20 = z.strictObject({
-  AccountKey20: z.strictObject({ network: NetworkId, key: HexString }),
+  AccountKey20: z.strictObject({ network: NetworkId, key: HexString20 }),
 });
 
 export const JunctionPalletInstance = z.strictObject({ PalletInstance: Uint8 });
